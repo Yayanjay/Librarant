@@ -28,7 +28,8 @@ const mainRouter = new VueRouter({
         {
             path: '/books',
             name: 'Book',
-            component: Book
+            component: Book,
+            // meta: 
         },
         {
             path: '/detail/:id',

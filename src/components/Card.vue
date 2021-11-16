@@ -3,18 +3,18 @@
       <!-- <v-btn @click="test" x-small>
           test button
       </v-btn> -->  
-      <v-card class="ma-3" v-for="book in books" :key="book.id">
+      <v-card class="ma-3" width="250px" v-for="book in books" :key="book.id">
         <div class="cover">
-          <v-img class="ma-2" :src="book.bookImage" width="150px" ></v-img>
+          <v-img class="mx-auto" :src="book.bookImage" width="150px" ></v-img>
         </div>
-          <v-card-title class="text-wrap">
+          <v-card-title>
             {{ book.bookName }}
           </v-card-title>
           <v-card-subtitle>
             {{ book.bookAuthor }}
           </v-card-subtitle>
-          <v-card-action >
-            <v-btn class="ma-3 mt-0" width="90%" color="#fce38a" @click="ADD_TO_CART(product)">Add to Cart</v-btn>
+          <v-card-action>
+            <v-btn class="ma-3 mt-0" width="90%" color="#fce38a" @click="detail(book.bookId)">View Detail</v-btn>
           </v-card-action>
       </v-card>
   </div>
@@ -32,7 +32,7 @@ export default {
       fetch() {
         Axios({
           method: 'get',
-          url: "http://localhost:3200/api/books"
+          url: "https://api-librarent.herokuapp.com/api/books"
         })
         .then((res) => {
             this.books = res.data.result
@@ -40,6 +40,10 @@ export default {
           }).catch((err) => {
             console.log(err)
           });
+      },
+
+      detail(id) {
+        this.$router.push('/detail/' + id)
       }
 
     },

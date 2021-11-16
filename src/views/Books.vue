@@ -14,73 +14,64 @@
             >
               <v-toolbar-title>Books</v-toolbar-title>
               <v-spacer></v-spacer>
-              <v-dialog
-                v-model="dialogAdd"
-                max-width="500px"
-              >
+              <v-dialog v-model="dialogAdd" max-width="600px">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    color="primary"
-                    dark
-                    class="mb-2"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    New Item
+                  <v-btn color="primary" dark v-bind="attrs" v-on="on">
+                    Add Book
                   </v-btn>
                 </template>
-
                 <v-card>
                   <v-card-title>
-                    <span class="text-h5">{{ formTitle }}</span>
+                    <span class="text-h5">Add Book</span>
                   </v-card-title>
-
                   <v-card-text>
                     <v-container>
                       <v-row>
                         <v-col cols="12">
                           <v-text-field
-                            v-model="addedItem.bookName"
                             label="Book Title"
+                            required
+                            v-model="addBookForm.bookName"
                           ></v-text-field>
                         </v-col>
                         <v-col cols="12">
                           <v-text-field
-                            v-model="addedItem.bookImage"
-                            label="Book Image"
-                          ></v-text-field>
-                        </v-col>
-                        <v-col cols="12">
-                          <v-text-field
-                            v-model="addedItem.bookAuthor"
                             label="Book Author"
+                            required
+                            v-model="addBookForm.bookAuthor"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="12">
+                          <v-text-field
+                            label="Image URL"
+                            required
+                            v-model="addBookForm.bookImage"
                           ></v-text-field>
                         </v-col>
                         <v-col cols="12">
                           <v-select
-                            v-model="addedItem.genreId"
-                            :items="genre"
+                            :items="genres"
                             label="Genre"
+                            required
+                            v-model="addBookForm.genreId"
                           ></v-select>
+                        </v-col>
+                        <v-col>
+                          <v-textarea
+                            counter
+                            label="Summary"
+                            required
+                            v-model="addBookForm.bookDesc"
+                            :rules="descRules"
+                          ></v-textarea>
                         </v-col>
                       </v-row>
                     </v-container>
+                    <small>*indicates required field</small>
                   </v-card-text>
-
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn
-                      color="blue darken-1"
-                      text
-                      @click="close"
-                    >
-                      Cancel
-                    </v-btn>
-                    <v-btn
-                      color="blue darken-1"
-                      text
-                      @click="save"
-                    >
+                    <v-btn color="blue darken-1" text @click="submitAddBookForm">
                       Save
                     </v-btn>
                   </v-card-actions>
@@ -108,7 +99,7 @@
           </template>
           
           <template v-slot:[`item.action`]="{ item }">
-            <v-btn depressed outlined class="pa-2 ml-2" color="light-green">
+            <v-btn depressed dark class="pa-2 ml-2" color="light-green">
               <v-icon
                 @click="editItem(item)"
               >
@@ -116,7 +107,7 @@
               </v-icon>
             </v-btn>
 
-            <v-btn depressed outlined class="pa-2 ml-2" color="red">
+            <v-btn depressed dark class="pa-2 ml-2" color="red">
               <v-icon
                 @click="deleteItem(item)"
               >
@@ -143,21 +134,27 @@ export default {
     dialogDelete: false,
     search: '',
     headers: [
+      { text: 'No', value: 'bookId'},
       { text: 'Cover', value: 'bookImage', sortable: false },
-      {
-        text: 'Title',
-        align: 'start',
-        value: 'bookName',
-      },
-      { text: 'Author', value: 'bookAuthor' },
-      { text: 'Genre', value: 'genreId.genre' },
-      { text: 'Actions', value: 'action', sortable: false, align: 'center' },
+      { text: 'Title', align: 'start', value: 'bookName',},
+      { text: 'Author', value: 'bookAuthor'},
+      { text: 'Genre', value: 'genreId.genre'},
+      { text: 'Actions', value: 'action', sortable: false, align: 'center'},
     ],
     books: [],
-    genre: ['Fiksi', 'Non Fiksi'],
+    genres: [],
+    number: [],
+    addBookForm: {
+      bookName : null,
+      bookAuthor: null,
+      bookImage: null,
+      bookDesc: null,
+      genreId: null
+    },
     addedItem: {
 
     },
+    descRules: [v => v.length <= 255 || 'Max 255 characters'],
     editedIndex: -1,
     editedItem: {
       name: '',
@@ -181,32 +178,7 @@ export default {
     },
   },
 
-  watch: {
-    dialog (val) {
-      val || this.close()
-    },
-    dialogDelete (val) {
-      val || this.closeDelete()
-    },
-  },
-
-  created () {
-    this.initialize()
-  },
-
   methods: {
-    initialize () {
-      Axios({
-        method: 'get',
-        url: "http://localhost:3200/api/books"
-      })
-      .then((res) => {
-          this.books = res.data.result
-          console.log(res.data.result)
-        }).catch((err) => {
-          console.log(err)
-        });
-    },
     editItem (item) {
       this.editedIndex = this.desserts.indexOf(item)
       this.editedItem = Object.assign({}, item)
@@ -225,7 +197,7 @@ export default {
     },
 
     close () {
-      this.dialog = false
+      this.dialogAdd = false
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
         this.editedIndex = -1
@@ -239,19 +211,103 @@ export default {
         this.editedIndex = -1
       })
     },
-
-    save () {
-      if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem)
-      } else {
-        this.desserts.push(this.editedItem)
+    submitAddBookForm() {
+      const creds = JSON.parse(localStorage.getItem("creds"))
+      switch (this.addBookForm.genreId) {
+        case "Comedy":
+          this.addBookForm.genreId = 1
+          break;
+        case "Fantasy":
+          this.addBookForm.genreId = 2
+          break;
+        case "Fiction":
+          this.addBookForm.genreId = 3
+          break;
+        case "Historical":
+          this.addBookForm.genreId = 4
+          break;
+        case "Horror":
+          this.addBookForm.genreId = 5
+          break;
+        case "Mystery":
+          this.addBookForm.genreId = 6
+          break;
+        case "Non-Fiction":
+          this.addBookForm.genreId = 7
+          break;
+        case "Romance":
+          this.addBookForm.genreId = 8
+          break;
+        default:
+          break;
       }
-      this.close()
+
+      // const data = {
+
+      // }
+
+      Axios({
+        method: 'POST',
+        url: 'http://localhost:3200/api/books',
+        headers: {'Authorization': `Bearer ${creds.token}`},
+        data: this.addBookForm
+      })
+      .then((res) => {
+        alert("Add Book Succeed")
+        console.log(res);
+      }).catch((err) => {
+        console.log(this.addBookForm);
+        console.log(err);
+      });
+
+    },
+    fetchGenres() {
+      const creds = JSON.parse(localStorage.getItem("creds"))
+      
+      Axios({
+        method: 'get',
+        url: "https://api-librarent.herokuapp.com/api/genre",
+        headers: {'Authorization': `Bearer ${creds.token}`},
+      })
+      .then((res) => {
+        for (let i = 0; i < res.data.result.length; i++) {
+          const category = res.data.result[i];
+          this.genres.push(category.genre)
+          
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+      });
+    },
+    
+    fetchBook () {
+      const creds = JSON.parse(localStorage.getItem("creds"))
+
+      Axios({
+        method: 'get',
+        url: "https://api-librarent.herokuapp.com/api/books",
+        headers: {'Authorization': `Bearer ${creds.token}`},
+      })
+      .then((res) => {
+        for (let i = 0; i < res.data.result.length; i++) {
+          const book = res.data.result[i];
+          this.number.push(book.bookId)
+          // console.log(book);
+          
+        }
+          console.log(this.number);
+          this.books = res.data.result
+        })
+      .catch((err) => {
+        console.log(err)
+      });
     },
   },
 
   mounted() {
-    this.fetch()
+    this.fetchBook(),
+    this.fetchGenres()
   }
 }
 </script>

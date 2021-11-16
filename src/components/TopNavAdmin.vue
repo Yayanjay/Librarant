@@ -5,11 +5,17 @@
 			<v-btn plain @click.stop="drawer = !drawer">
         <v-icon>fas fa-bars</v-icon>
       </v-btn>
+	
+      <v-btn plain depressed class="" to="/">
+        LibraRent
+      </v-btn>
+      
+      <v-spacer></v-spacer>
 
-			<v-toolbar-title>LibraRent</v-toolbar-title>
-			<v-toolbar-items>
+      <v-btn color="yellow lighten-4" class="mx-3" @click="logout">
+        Logout
+      </v-btn>
 
-			</v-toolbar-items>
 		</v-app-bar>
 
 
@@ -26,7 +32,6 @@
 
 			<!-- menu list navigation drawer -->
       <v-list>
-        <!-- default render (any user can access) -->
         <v-list-item
           v-for="item in items"
           :key="item.title"
@@ -57,11 +62,14 @@ export default {
       { title: 'Explore', icon: 'fa fa-compass', routes: '/' },
       { title: 'History', icon: 'fa fa-history', routes: '/history' },
       { title: 'Profile', icon: 'fa fa-user', routes: '/profile' },
+      { title: 'Books', icon: 'fa fa-book', routes: '/books' },
     ],
-    features: [
-      { title: 'Book', icon: 'fa fa-book', routes: '/book'},
-    ]
   }),
+  methods: {
+    logout() {
+      localStorage.removeItem("creds")
+    }
+  }
 }
 </script>
 

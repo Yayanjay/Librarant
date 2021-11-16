@@ -1,6 +1,14 @@
 <template>
   <div>
-    <TopNav />
+    <div v-if="creds.role == 'User'">
+      <TopNavUser/>
+    </div >
+    <div v-else-if="creds.role == 'admin'">
+      <TopNavAdmin/>
+    </div>
+    <div v-else>
+      <TopNav />
+    </div>
 
     <v-container fluid>
       <v-row>
@@ -12,31 +20,23 @@
 
 <script>
 import TopNav from "../components/TopNav.vue"
+import TopNavUser from "../components/TopNavUser.vue"
+import TopNavAdmin from "../components/TopNavAdmin.vue"
 import Card from '../components/Card.vue'
 
 
 export default {
     name: 'Home',
     data: () => ({
-      colors: [
-        'indigo',
-        'warning',
-        'pink darken-2',
-        'red lighten-1',
-        'deep-purple accent-4',
-      ],
-      slides: [
-        'First',
-        'Second',
-        'Third',
-        'Fourth',
-        'Fifth',
-      ],
-      books: []
+      books: [],
+      creds : JSON.parse(localStorage.getItem("creds"))
+
     }),
     components: {
       TopNav,
       Card,
+      TopNavUser,
+      TopNavAdmin
     }
 }
 </script>

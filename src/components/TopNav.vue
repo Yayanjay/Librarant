@@ -6,17 +6,17 @@
         <v-icon>fas fa-bars</v-icon>
       </v-btn>
 
-      <v-btn plain class="" to="/">
+      <v-btn plain depressed class="" to="/">
         LibraRent
       </v-btn>
       
       <v-spacer></v-spacer>
 
-      <v-btn outlined color="green" class="mx-3" to="/signin">
+      <v-btn color="yellow lighten-4" class="mx-3" to="/signin">
         Sign In
       </v-btn>
 
-      <v-btn outlined color="green " class="mx-3" to="/signup">
+      <v-btn color="yellow lighten-4 " class="mx-3" to="/signup">
         Sign Up
       </v-btn>
 		</v-app-bar>
@@ -68,9 +68,6 @@ export default {
       { title: 'Profile', icon: 'fa fa-user', routes: '/profile' },
       { title: 'Books', icon: 'fa fa-book', routes: '/books' },
     ],
-    features: [
-      { title: 'Book', icon: 'fa fa-book', routes: '/book'},
-    ]
   }),
 }
 </script>

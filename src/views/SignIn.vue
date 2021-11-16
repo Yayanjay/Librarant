@@ -60,7 +60,7 @@ export default {
 		password: '',
 		passRules: [
       v => !!v || 'Password is required',
-      v => /^(?=.*[a-z])(?=.*[0-9])/.test(v) || 'password must contain letter and number',
+      // v => /^(?=.*[a-z])(?=.*[0-9])/.test(v) || 'password must contain letter and number',
     ],
     email: '',
     emailRules: [
@@ -79,13 +79,20 @@ export default {
 
 			Axios({
 				method: "post",
-				url: "http://localhost:3200/api/users/signin",
+				url: "https://api-librarent.herokuapp.com/api/users/signin",
 				data,
 			})
 
 			.then((res) => {
-				alert(res.status)
-				console.log(res.data)
+				alert(res.data.message)
+        let data = {
+          "username" : res.data.result.username, 
+          "email" : res.data.result.email, 
+          "role" : res.data.result.role, 
+          "token" : res.data.result.token
+        }
+        localStorage.setItem('creds', JSON.stringify(data))
+        // console.log(res.data.result)
         this.$router.push({ path: "/"})
 			
 			})

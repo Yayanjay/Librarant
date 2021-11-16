@@ -5,11 +5,17 @@
 			<v-btn plain @click.stop="drawer = !drawer">
         <v-icon>fas fa-bars</v-icon>
       </v-btn>
+	
+      <v-btn plain depressed class="" to="/">
+        LibraRent
+      </v-btn>
+      
+      <v-spacer></v-spacer>
 
-			<v-toolbar-title>LibraRent</v-toolbar-title>
-			<v-toolbar-items>
+      <v-btn color="yellow lighten-4" class="mx-3" @click="logout">
+        Logout
+      </v-btn>
 
-			</v-toolbar-items>
 		</v-app-bar>
 
 
@@ -17,16 +23,13 @@
 
       <!-- header navigation drawer -->
       <v-card class="text-center" elevation="0">
-        <v-card-img>
-          <v-img width="10rem" class="ava mx-auto mt-10" src="https://randomuser.me/api/portraits/men/78.jpg"></v-img>
-        </v-card-img>
+        <v-img width="10rem" class="ava mx-auto mt-10" src="https://randomuser.me/api/portraits/men/78.jpg"></v-img>
         <v-card-title class="justify-center">Admin Magang</v-card-title>
         <v-card-subtitle>adminmagang@gmail.com</v-card-subtitle>
       </v-card>
 
 			<!-- menu list navigation drawer -->
       <v-list>
-        <!-- default render (any user can access) -->
         <v-list-item
           v-for="item in items"
           :key="item.title"
@@ -55,13 +58,19 @@ export default {
     drawer: null,
     items: [
       { title: 'Explore', icon: 'fa fa-compass', routes: '/' },
-      { title: 'History', icon: 'fa fa-history', routes: '/history' },
       { title: 'Profile', icon: 'fa fa-user', routes: '/profile' },
     ],
-    features: [
-      { title: 'Book', icon: 'fa fa-book', routes: '/book'},
-    ]
   }),
+  methods: {
+    logout() {
+      let check = confirm("are you sure want to logout?")
+
+      if (check) {
+        localStorage.removeItem("creds")
+        this.$router.push({ path: "/signin"})
+      }
+    }
+  }
 }
 </script>
 

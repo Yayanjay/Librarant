@@ -18,13 +18,13 @@
         <v-col md="4" sm="12" xs="2">
           <v-card class="elevation-3 rounded-lg" color="purple lighten-4">
             <v-card-title class="justify-center">Total books</v-card-title>
-            <v-card-subtitle class="text-overline">20</v-card-subtitle>
+            <v-card-subtitle class="text-overline">{{histories.length}}</v-card-subtitle>
           </v-card>
         </v-col>
       </v-row>
 
       <v-card class="my-2 rounded-lg">
-        <v-card-title class="text-h6">REVENUE</v-card-title>
+        <v-card-title class="text-h6">Graph</v-card-title>
         <v-divider></v-divider>
         <v-sparkline
           :value="value"
@@ -32,7 +32,6 @@
           :padding="padding"
           :line-width="width"
           :stroke-linecap="lineCap"
-          :gradient-direction="gradientDirection"
           :fill="fill"
           :type="type"
           :auto-line-width="autoLineWidth"
@@ -52,6 +51,7 @@
 </template>
 
 <script>
+import Axios from 'axios'
 import Topnav from '../components/TopNav'
 export default {
   name: "History",
@@ -65,91 +65,40 @@ export default {
       type: 'trend',
       autoLineWidth: false,
       headers: [
-        {
-          text: 'Invoices',
+        { text: 'No',
           align: 'start',
-          value: 'invoice',
+          value: 'historyId',
         },
-        { text: 'Cashier', value: 'cashier' },
+        { text: 'Librarian', value: 'librarian' },
         { text: 'Date', value: 'date' },
-        { text: 'Orders', value: 'order' },
-        { text: 'Amount', value: 'amount' },
+        { text: 'Book', value: 'bookId.bookName' },
+        { text: 'Borrower', value: 'userId.userName' },
+        { text: 'Status', value: 'status' },
       ],
-      histories: [
-        {
-          invoice: '#11342',
-          cashier: 'Zayyan',
-          date: '05.40 AM, 8 September 2021',
-          order: ['Black Forest', ' Coffee Latte'],
-          amount: 'Rp ' + 45000,
-        },
-        {
-          invoice: 'Ice cream sandwich',
-          cashier: 237,
-          date: 9.0,
-          order: 37,
-          amount: 4.3,
-        },
-        {
-          invoice: 'Eclair',
-          cashier: 262,
-          date: 16.0,
-          order: 23,
-          amount: 6.0,
-        },
-        {
-          invoice: 'Cupcake',
-          cashier: 305,
-          date: 3.7,
-          order: 67,
-          amount: 4.3,
-        },
-        {
-          invoice: 'Gingerbread',
-          cashier: 356,
-          date: 16.0,
-          order: 49,
-          amount: 3.9,
-        },
-        {
-          invoice: 'Jelly bean',
-          cashier: 375,
-          date: 0.0,
-          order: 94,
-          amount: 0.0,
-        },
-        {
-          invoice: 'Lollipop',
-          cashier: 392,
-          date: 0.2,
-          order: 98,
-          amount: 0,
-        },
-        {
-          invoice: 'Honeycomb',
-          cashier: 408,
-          date: 3.2,
-          order: 87,
-          amount: 6.5,
-        },
-        {
-          invoice: 'Donut',
-          cashier: 452,
-          date: 25.0,
-          order: 51,
-          amount: 4.9,
-        },
-        {
-          invoice: 'KitKat',
-          cashier: 518,
-          date: 26.0,
-          order: 65,
-          amount: 7,
-        },
-      ],
+      histories: []
   }),
   components: {
     Topnav
+  },
+  methods: {
+    fetchHistories() {
+      const creds = JSON.parse(localStorage.getItem("creds"))
+      Axios({
+        method: "get",
+        url: "https://api-librarent.herokuapp.com/api/history",
+        headers: {'Authorization': `Bearer ${creds.token}`},
+      })
+      .then((res) => {
+        this.histories = res.data.result
+        console.log(this.histories);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    }
+  },
+  mounted() {
+    this.fetchHistories()
   }
 }
 </script>
