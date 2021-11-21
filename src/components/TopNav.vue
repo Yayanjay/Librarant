@@ -26,31 +26,22 @@
 
       <!-- header navigation drawer -->
       <v-card class="text-center" elevation="0">
-        <v-avatar >
-          <v-img class="ava mx-auto mt-10" src="https://randomuser.me/api/portraits/men/78.jpg"></v-img>
-        </v-avatar>
-        <v-card-title class="justify-center">Admin Magang</v-card-title>
-        <v-card-subtitle>adminmagang@gmail.com</v-card-subtitle>
+        
       </v-card>
-
-			<!-- menu list navigation drawer -->
-      <v-list>
-        <!-- default render (any user can access) -->
-        <v-list-item
-          v-for="item in items"
-          :key="item.title"
-          :to="item.routes"
-					link
-        >
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
-
-          <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
+      <v-row>
+        <v-col class="mx-auto">
+          <v-img class="mx-auto" src="https://user-images.githubusercontent.com/34501764/142628920-73386364-94d0-495a-9bb9-1ec6ef07cd67.jpg">
+          </v-img>
+            <div class="text-button mx-auto">May i know who you are?</div>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-btn large class="mx-auto" color="yellow lighten-4" to="/signin">
+            Sign In
+          </v-btn>
+        </v-col>
+      </v-row>
 
 		</v-navigation-drawer>
 
@@ -64,9 +55,7 @@ export default {
     drawer: null,
     items: [
       { title: 'Explore', icon: 'fa fa-compass', routes: '/' },
-      { title: 'History', icon: 'fa fa-history', routes: '/history' },
       { title: 'Profile', icon: 'fa fa-user', routes: '/profile' },
-      { title: 'Books', icon: 'fa fa-book', routes: '/books' },
     ],
   }),
 }

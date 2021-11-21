@@ -75,10 +75,9 @@ export default {
 				userPassword : this.password
 			}
 
-			console.log(data)
-
 			Axios({
 				method: "post",
+          // url: 'http://localhost:3200/api/users/signin',
 				url: "https://api-librarent.herokuapp.com/api/users/signin",
 				data,
 			})
@@ -89,20 +88,17 @@ export default {
           "username" : res.data.result.username, 
           "email" : res.data.result.email, 
           "role" : res.data.result.role, 
-          "token" : res.data.result.token
+          "token" : res.data.result.token,
+          "authenticated" : true
         }
         localStorage.setItem('creds', JSON.stringify(data))
-        // console.log(res.data.result)
-        this.$router.push({ path: "/"})
+        this.$router.push({ path: "/history"})
 			
 			})
 			.catch((err) => {
-				console.log(err)
+				console.log(err.message)
 			})
 		},
-		tes() {
-			console.log(this.email, this.password)
-		}
 	}
 }
 </script>

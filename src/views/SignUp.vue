@@ -70,20 +70,21 @@ export default {
 				userName : this.username,
 				userEmail : this.email,
 				userPassword : this.password,
-				userRole : "User"
+				userRole : "user"
 			}
 
 			console.log(data)
 
 			Axios({
 				method: "post",
-				url: "https://api-librarent.herokuapp.com/api/users/signup",
+				// url: "https://api-librarent.herokuapp.com/api/users/signup",
+				url: 'http://localhost:3200/api/users/signup',
 				data,
 			})
 
 			.then((res) => {
 				alert(res.status)
-
+				this.$router.push({ path: "/signin"})
 			})
 			.catch((err) => {
 				console.log(data)

@@ -67,7 +67,12 @@ export default {
   }),
   methods: {
     logout() {
-      localStorage.removeItem("creds")
+      let check = confirm("are you sure want to logout?")
+
+      if (check) {
+        localStorage.removeItem("creds")
+        this.$router.push({ path: "/signin"})
+      }
     }
   }
 }
