@@ -32,7 +32,9 @@ export default {
       fetch() {
         Axios({
           method: 'get',
-          url: "https://api-librarent.herokuapp.com/api/books"
+          url: "https://api-librarent.herokuapp.com/api/books",
+        // url: `http://localhost:3200/api/books`,
+
         })
         .then((res) => {
             this.books = res.data.result

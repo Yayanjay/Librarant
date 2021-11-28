@@ -23,11 +23,9 @@
 
       <!-- header navigation drawer -->
       <v-card class="text-center" elevation="0">
-        <v-card-img>
-          <v-img width="10rem" class="ava mx-auto mt-10" src="https://randomuser.me/api/portraits/men/78.jpg"></v-img>
-        </v-card-img>
-        <v-card-title class="justify-center">Admin Magang</v-card-title>
-        <v-card-subtitle>adminmagang@gmail.com</v-card-subtitle>
+        <v-img width="10rem" class="ava mx-auto mt-10" src="https://randomuser.me/api/portraits/men/78.jpg"></v-img>
+        <v-card-title class="justify-center">{{ creds.username }}</v-card-title>
+        <v-card-subtitle>{{ creds.email }}</v-card-subtitle>
       </v-card>
 
 			<!-- menu list navigation drawer -->
@@ -57,6 +55,7 @@
 export default {
 	name: "TopNav",
   data: () => ({
+    creds : JSON.parse(localStorage.getItem("creds")),
     drawer: null,
     items: [
       { title: 'Explore', icon: 'fa fa-compass', routes: '/' },

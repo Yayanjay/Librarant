@@ -2,7 +2,9 @@
 	<div>
 	<v-row class="auth">
 		<v-col class="pink lighten-3" cols="6">
-		left
+			<div class="card d-flex justify-center">
+				<AuthLeft />
+			</div>
 		</v-col>
 		<v-col class="blue lighten-3" cols="6">
 		<div class="card d-flex justify-center">
@@ -43,6 +45,7 @@
 
 <script>
 import Axios from 'axios'
+import AuthLeft from '../components/AuthLeft.vue'
 
 export default {
 	data: () => ({
@@ -64,6 +67,7 @@ export default {
 					v => /^(?=.*[a-z])(?=.*[0-9])/.test(v) || 'password must contain letter and number',
 		],
 	}),
+	components: {AuthLeft},
 	methods: {
 		signUp() {
 			const data = {
@@ -76,9 +80,9 @@ export default {
 			console.log(data)
 
 			Axios({
-				method: "post",
-				// url: "https://api-librarent.herokuapp.com/api/users/signup",
-				url: 'http://localhost:3200/api/users/signup',
+				method: "POST",
+				url: "https://api-librarent.herokuapp.com/api/users/signup",
+				// url: 'http://localhost:3200/api/users/signup',
 				data,
 			})
 

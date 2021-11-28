@@ -1,6 +1,19 @@
 <template>
   <div>
-    <Topnav />
+    <div v-if="creds.authenticated == true">
+      <div v-if="creds.role[0] == 'user'">
+        <TopNavUser/>
+      </div >
+      <div v-else-if="creds.role[0] == 'admin'">
+        <TopNavAdmin/>
+      </div>
+      <div v-else>
+        <TopNav />
+      </div>
+    </div>
+    <div v-else>
+      <TopNav />
+    </div>
     <v-container fluid>
       <v-row class="text-center mt-4">
         <v-col md="4" sm="12" xs="2">
@@ -52,33 +65,38 @@
 
 <script>
 import Axios from 'axios'
-import Topnav from '../components/TopNav'
+import TopNav from '../components/TopNav.vue'
+import TopNavAdmin from '../components/TopNavAdmin.vue'
+import TopNavUser from '../components/TopNavUser.vue'
 export default {
   name: "History",
   data: () => ({
-      width: 1,
-      radius: 10,
-      padding: 8,
-      lineCap: 'round',
-      value: [0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8, 2, 9, 0],
-      fill: false,
-      type: 'trend',
-      autoLineWidth: false,
-      headers: [
-        { text: 'No',
-          align: 'start',
-          value: 'historyId',
-        },
-        { text: 'Librarian', value: 'librarian' },
-        { text: 'Date', value: 'date' },
-        { text: 'Book', value: 'bookId.bookName' },
-        { text: 'Borrower', value: 'userId.userName' },
-        { text: 'Status', value: 'status' },
-      ],
-      histories: []
+    creds : JSON.parse(localStorage.getItem("creds")),
+    width: 1,
+    radius: 10,
+    padding: 8,
+    lineCap: 'round',
+    value: [0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8, 2, 9, 0],
+    fill: false,
+    type: 'trend',
+    autoLineWidth: false,
+    headers: [
+      { text: 'No',
+        align: 'start',
+        value: 'historyId',
+      },
+      { text: 'Librarian', value: 'librarian' },
+      { text: 'Date', value: 'date' },
+      { text: 'Book', value: 'bookId.bookName' },
+      { text: 'Borrower', value: 'userId.userName' },
+      { text: 'Status', value: 'status' },
+    ],
+    histories: []
   }),
   components: {
-    Topnav
+    TopNav,
+    TopNavAdmin,
+    TopNavUser
   },
   methods: {
     fetchHistories() {

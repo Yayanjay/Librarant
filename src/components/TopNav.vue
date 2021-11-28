@@ -24,22 +24,21 @@
 
     <v-navigation-drawer v-model="drawer" :width="400" absolute temporary app >
 
-      <!-- header navigation drawer -->
-      <v-card class="text-center" elevation="0">
-        
-      </v-card>
       <v-row>
         <v-col class="mx-auto">
-          <v-img class="mx-auto" src="https://user-images.githubusercontent.com/34501764/142628920-73386364-94d0-495a-9bb9-1ec6ef07cd67.jpg">
-          </v-img>
-            <div class="text-button mx-auto">May i know who you are?</div>
+          <div class="d-flex justify-center">
+            <v-img width="50%" src="https://user-images.githubusercontent.com/34501764/142628920-73386364-94d0-495a-9bb9-1ec6ef07cd67.jpg"></v-img>
+          </div>
+          <div class="text-button text-center mx-auto">May i know who you are?</div>
         </v-col>
       </v-row>
       <v-row>
         <v-col>
-          <v-btn large class="mx-auto" color="yellow lighten-4" to="/signin">
-            Sign In
-          </v-btn>
+          <div class="d-flex justify-center">
+            <v-btn large class="mx-auto" color="yellow lighten-4" to="/signin">
+              Sign In
+            </v-btn>
+          </div>
         </v-col>
       </v-row>
 

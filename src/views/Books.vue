@@ -1,6 +1,20 @@
 <template>
   <div>
-    <TopNav />
+    <div v-if="creds.authenticated == true">
+      <div v-if="creds.role[0] == 'user'">
+        <TopNavUser/>
+      </div >
+      <div v-else-if="creds.role[0] == 'admin'">
+        <TopNavAdmin/>
+      </div>
+      <div v-else>
+        <TopNav />
+      </div>
+    </div>
+    <div v-else>
+      <TopNav />
+    </div>
+
     <v-container fluid >
       <template>
         <v-data-table
@@ -48,12 +62,20 @@
                             v-model="addBookForm.bookImage"
                           ></v-text-field>
                         </v-col>
-                        <v-col cols="12">
+                        <v-col cols="6">
                           <v-select
                             :items="genres"
                             label="Genre"
                             required
                             v-model="addBookForm.genreId"
+                          ></v-select>
+                        </v-col>
+                        <v-col cols="6">
+                          <v-select
+                            :items="types"
+                            label="Type"
+                            required
+                            v-model="addBookForm.typeId"
                           ></v-select>
                         </v-col>
                         <v-col>
@@ -62,12 +84,11 @@
                             label="Summary"
                             required
                             v-model="addBookForm.bookDesc"
-                            :rules="descRules"
+                            hint="Max 400 characters"
                           ></v-textarea>
                         </v-col>
                       </v-row>
                     </v-container>
-                    <small>*indicates required field</small>
                   </v-card-text>
                   <v-card-actions>
                     <v-spacer></v-spacer>
@@ -78,12 +99,80 @@
                 </v-card>
               </v-dialog>
 
-              <v-dialog v-model="dialogDelete" max-width="500px">
+              <v-dialog v-model="dialogEdit" max-width="600px">
                 <v-card>
-                  <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
+                  <v-card-title>
+                    <span class="text-h5">Edit Book</span>
+                  </v-card-title>
+                  <v-card-text>
+                    <v-container>
+                      <v-row>
+                        <v-col cols="12">
+                          <v-text-field
+                            label="Book Title"
+                            required
+                            
+                            v-model="editBookForm.bookName"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="12">
+                          <v-text-field
+                            label="Book Author"
+                            required
+                            
+                            v-model="editBookForm.bookAuthor"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="12">
+                          <v-text-field
+                            label="Image URL"
+                            required
+                            
+                            v-model="editBookForm.bookImage"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                          <v-select
+                            :items="genres"
+                            label="Genre"
+                            required
+                            v-model="editBookForm.genreId"
+                          ></v-select>
+                        </v-col>
+                        <v-col cols="6">
+                          <v-select
+                            :items="types"
+                            label="Type"
+                            required
+                            v-model="editBookForm.typeId"
+                          ></v-select>
+                        </v-col>
+                        <v-col>
+                          <v-textarea
+                            counter
+                            label="Summary"
+                            required
+                            v-model="editBookForm.bookDesc"
+                          ></v-textarea>
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-card-text>
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
+                    <v-btn color="blue darken-1" text @click="submitEditBookForm">
+                      Save
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+
+              <v-dialog v-model="dialogDelete" max-width="500px">
+                <v-card>
+                  <v-card-title class="text-h5">Are you sure you want to delete this book?</v-card-title>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" text @click="dialogDelete = false">Cancel</v-btn>
                     <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
                     <v-spacer></v-spacer>
                   </v-card-actions>
@@ -99,24 +188,21 @@
           </template>
           
           <template v-slot:[`item.action`]="{ item }">
-            <v-btn depressed dark class="pa-2 ml-2" color="light-green">
-              <v-icon
-                @click="editItem(item)"
-              >
+            <v-btn depressed dark class="pa-2 ml-2" color="light-green" @click="editItem(item)">
+              <v-icon>
                 fa fa-edit
               </v-icon>
             </v-btn>
 
-            <v-btn depressed dark class="pa-2 ml-2" color="red">
-              <v-icon
-                @click="deleteItem(item)"
-              >
+            <v-btn depressed dark class="pa-2 ml-2" color="red" @click="deleteItem(item)">
+              <v-icon>
                 far fa-trash-alt
               </v-icon>
             </v-btn>
           </template>
         </v-data-table>
       </template>
+
     </v-container>
   </div>
 </template>
@@ -124,52 +210,53 @@
 <script>
 import Axios from 'axios'
 import TopNav from '../components/TopNav.vue'
+import TopNavAdmin from '../components/TopNavAdmin.vue'
+import TopNavUser from '../components/TopNavUser.vue'
 export default {
   name: "books",
   components: {
-    TopNav
+    TopNav,
+    TopNavAdmin,
+    TopNavUser
   },
   data: () => ({
+    creds : JSON.parse(localStorage.getItem("creds")),
     dialogAdd: false,
     dialogDelete: false,
+    dialogEdit: false,
     search: '',
     headers: [
       { text: 'No', value: 'bookId'},
       { text: 'Cover', value: 'bookImage', sortable: false },
       { text: 'Title', align: 'start', value: 'bookName',},
       { text: 'Author', value: 'bookAuthor'},
+      { text: 'Type', value: 'typeId.type'},
       { text: 'Genre', value: 'genreId.genre'},
       { text: 'Actions', value: 'action', sortable: false, align: 'center'},
     ],
     books: [],
     genres: [],
+    types: [],
     number: [],
     addBookForm: {
       bookName : null,
       bookAuthor: null,
       bookImage: null,
       bookDesc: null,
-      genreId: null
+      genreId: null,
+      typeId: null,
     },
-    addedItem: {
-
+    editBookForm: {
+      bookName : null,
+      bookAuthor: null,
+      bookImage: null,
+      bookDesc: null,
+      genreId: null,
+      typeId: null,
     },
-    descRules: [v => v.length <= 255 || 'Max 255 characters'],
-    editedIndex: -1,
-    editedItem: {
-      name: '',
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
-    },
-    defaultItem: {
-      name: '',
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
-    },
+    editedItem: null,
+    deletedItem: null
+    
   }),
 
   computed: {
@@ -180,36 +267,103 @@ export default {
 
   methods: {
     editItem (item) {
-      this.editedIndex = this.desserts.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialog = true
+      this.editBookForm.bookName = item.bookName
+      this.editBookForm.bookAuthor = item.bookAuthor
+      this.editBookForm.bookImage = item.bookImage
+      this.editBookForm.genreId= item.genreId.genre
+      this.editBookForm.typeId= item.typeId.type
+      this.editBookForm.bookDesc = item.bookDesc
+      this.editedItem = item.bookId
+      this.dialogEdit = true
+      console.log(this.editBookForm);
+      console.log(this.editedItem);
+
     },
 
     deleteItem (item) {
-      this.editedIndex = this.desserts.indexOf(item)
-      this.editedItem = Object.assign({}, item)
+      this.deletedItem = item.bookId
       this.dialogDelete = true
+      console.log(this.deletedItem);
     },
+    submitEditBookForm() {
+      const creds = JSON.parse(localStorage.getItem("creds"))
+      switch (this.editBookForm.genreId) {
+        case "Comedy":
+          this.editBookForm.genreId = 1
+          break;
+        case "Fantasy":
+          this.editBookForm.genreId = 2
+          break;
+        case "Fiction":
+          this.editBookForm.genreId = 3
+          break;
+        case "Historical":
+          this.editBookForm.genreId = 4
+          break;
+        case "Horror":
+          this.editBookForm.genreId = 5
+          break;
+        case "Mystery":
+          this.editBookForm.genreId = 6
+          break;
+        case "Non-Fiction":
+          this.editBookForm.genreId = 7
+          break;
+        case "Romance":
+          this.editBookForm.genreId = 8
+          break;
+        default:
+          break;
+      }
 
-    deleteItemConfirm () {
-      this.desserts.splice(this.editedIndex, 1)
-      this.closeDelete()
-    },
+      switch (this.editBookForm.typeId) {
+        case "Comic":
+          this.editBookForm.typeId = 1
+          break;
+        case "Encyclopedia":
+          this.editBookForm.typeId = 2
+          break;
+        case "Novel":
+          this.editBookForm.typeId = 3
+          break;
+        default:
+          break;
+      }
 
-    close () {
-      this.dialogAdd = false
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
+        console.log(this.editBookForm);
+      Axios({
+        method: 'PUT',
+        url: `https://api-librarent.herokuapp.com/api/books/${this.editedItem}`,
+        // url: `http://localhost:3200/api/books/${this.editedItem}`,
+        headers: {'Authorization': `Bearer ${creds.token}`,},
+        data: this.editBookForm
       })
-    },
+      .then((res) => {
+        alert("Update Book Succeed")
+        location.reload()
+        console.log(res);
+      }).catch((err) => {
+        // console.log();
+        console.log(err);
+      });
 
-    closeDelete () {
-      this.dialogDelete = false
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
+
+    },
+    deleteItemConfirm() {
+      const creds = JSON.parse(localStorage.getItem("creds"))
+
+      Axios({
+        method: 'DELETE',
+        url: `https://api-librarent.herokuapp.com/api/books/${this.deletedItem}`,
+        headers: {'Authorization': `Bearer ${creds.token}`,},
       })
+      .then((res) => {
+        alert("Delete Book Succeed")
+        location.reload()
+        console.log(res);
+      }).catch((err) => {
+        console.log(err);
+      });
     },
     submitAddBookForm() {
       const creds = JSON.parse(localStorage.getItem("creds"))
@@ -242,24 +396,53 @@ export default {
           break;
       }
 
-      // const data = {
-
-      // }
+      switch (this.addBookForm.typeId) {
+        case "Comic":
+          this.addBookForm.typeId = 1
+          break;
+        case "Encyclopedia":
+          this.addBookForm.typeId = 2
+          break;
+        case "Novel":
+          this.addBookForm.typeId = 3
+          break;
+        default:
+          break;
+      }
 
       Axios({
         method: 'POST',
-        url: 'http://localhost:3200/api/books',
-        headers: {'Authorization': `Bearer ${creds.token}`},
+        url: 'https://api-librarent.herokuapp.com/api/books',
+        headers: {'Authorization': `Bearer ${creds.token}`,},
         data: this.addBookForm
       })
       .then((res) => {
         alert("Add Book Succeed")
+        location.reload()
         console.log(res);
       }).catch((err) => {
-        console.log(this.addBookForm);
         console.log(err);
       });
 
+    },
+    fetchTypes() {
+      const creds = JSON.parse(localStorage.getItem("creds"))
+      
+      Axios({
+        method: 'get',
+        url: "https://api-librarent.herokuapp.com/api/type",
+        headers: {'Authorization': `Bearer ${creds.token}`},
+      })
+      .then((res) => {
+        for (let i = 0; i < res.data.result.length; i++) {
+          const data = res.data.result[i];
+          this.types.push(data.type)
+          
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+      });
     },
     fetchGenres() {
       const creds = JSON.parse(localStorage.getItem("creds"))
@@ -271,8 +454,8 @@ export default {
       })
       .then((res) => {
         for (let i = 0; i < res.data.result.length; i++) {
-          const category = res.data.result[i];
-          this.genres.push(category.genre)
+          const data = res.data.result[i];
+          this.genres.push(data.genre)
           
         }
       })
@@ -293,12 +476,11 @@ export default {
         for (let i = 0; i < res.data.result.length; i++) {
           const book = res.data.result[i];
           this.number.push(book.bookId)
-          // console.log(book);
           
         }
-          console.log(this.number);
-          this.books = res.data.result
-        })
+        this.books = res.data.result
+        console.log(this.books);
+      })
       .catch((err) => {
         console.log(err)
       });
@@ -306,9 +488,11 @@ export default {
   },
 
   mounted() {
-    this.fetchBook(),
+    this.fetchBook()
     this.fetchGenres()
-  }
+    this.fetchTypes()
+  },
+
 }
 </script>
 

@@ -11,7 +11,7 @@
 			<v-img 
 				class="mx-auto"
 				width="70vh" 
-				src="https://user-images.githubusercontent.com/34501764/142715690-5f023f85-681a-44d2-a623-3e1d1795e046.jpg">
+				src="https://user-images.githubusercontent.com/34501764/142945220-9b0aacef-1edd-46cb-9edc-9d679232257a.jpg">
 			</v-img>
 		</v-card>
   </v-container>
