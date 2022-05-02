@@ -212,6 +212,8 @@ import Axios from 'axios'
 import TopNav from '../components/TopNav.vue'
 import TopNavAdmin from '../components/TopNavAdmin.vue'
 import TopNavUser from '../components/TopNavUser.vue'
+import {mapGetters, mapActions} from 'vuex'
+
 export default {
   name: "books",
   components: {
@@ -224,7 +226,6 @@ export default {
     dialogAdd: false,
     dialogDelete: false,
     dialogEdit: false,
-    search: '',
     headers: [
       { text: 'No', value: 'bookId'},
       { text: 'Cover', value: 'bookImage', sortable: false },
@@ -234,9 +235,6 @@ export default {
       { text: 'Genre', value: 'genreId.genre'},
       { text: 'Actions', value: 'action', sortable: false, align: 'center'},
     ],
-    books: [],
-    genres: [],
-    types: [],
     number: [],
     addBookForm: {
       bookName : null,
@@ -263,9 +261,11 @@ export default {
     formTitle () {
       return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
     },
+    ...mapGetters(["books", "genres", "types"])
   },
 
   methods: {
+    ...mapActions(["fetchBooks"]),
     editItem (item) {
       this.editBookForm.bookName = item.bookName
       this.editBookForm.bookAuthor = item.bookAuthor
@@ -491,6 +491,7 @@ export default {
     this.fetchBook()
     this.fetchGenres()
     this.fetchTypes()
+    this.fetchBooks()
   },
 
 }

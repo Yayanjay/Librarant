@@ -92,6 +92,9 @@ export default {
 			})
 
 			.then((res) => {
+				if (res.data.message == "Bad Credentials" || res.data.message == "bad credentials" ) {
+					return alert("email/password invalid")
+				}
 				alert(res.data.message)
 				let data = {
 					"username" : res.data.result.username, 
@@ -106,7 +109,7 @@ export default {
 			
 			})
 			.catch((err) => {
-				console.log(err.message)
+				console.log(err)
 			})
 		},
 	}

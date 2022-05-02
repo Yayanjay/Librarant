@@ -21,36 +21,25 @@
 </template>
 
 <script>
-import Axios from 'axios'
+// import Axios from 'axios'
+import {mapGetters, mapActions} from 'vuex'
 
 export default {
     name : "Card",
-    data: () => ({
-      books: [],
-    }),
+    data: () => ({}),
     methods: {
-      fetch() {
-        Axios({
-          method: 'get',
-          url: "https://api-librarent.herokuapp.com/api/books",
-        // url: `http://localhost:3200/api/books`,
-
-        })
-        .then((res) => {
-            this.books = res.data.result
-            console.log(this.books)
-          }).catch((err) => {
-            console.log(err)
-          });
-      },
+      ...mapActions(["fetchBooks"]),
 
       detail(id) {
         this.$router.push('/detail/' + id)
       }
 
     },
+    computed: {
+      ...mapGetters(["books"]),
+    },
     mounted() {
-      this.fetch()
+      this.fetchBooks()
     }
 
 }
